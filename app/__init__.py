@@ -19,6 +19,9 @@ def create_app(config_name):
   # get config
   app.config.from_object(app_config[config_name])
   app.config.from_pyfile('config.py')
+
+  # strict slashes
+  app.url_map.strict_slashes = False
   
   # db initialization
   db.init_app(app)
@@ -36,8 +39,15 @@ def create_app(config_name):
   from app.routes import routes
   routes(app, api)
 
-  @app.route('/')
-  def main():
-    return 'page not found'
+  @app.errorhandler(404)
+  def notFound(e):
+    return 'page not found', 404
+
+  @app.before_request
+  def clear_trailing():
+    from flask import redirect, request
+    rp = request.path 
+    if rp != '/' and rp.endswith('/'):
+      return redirect(rp[:-1])
 
   return app
