@@ -1,50 +1,77 @@
-import json
 
 from flask_restful import Resource, reqparse
 
+from app.service.type import TypeService
+
 from app.helper.error_handler import ErrorHandler
-
-from app.model.list import ListResponse
-
-from app.repository.type import TypeRepository
-
-from app.schema.type import TypeSchema
+from app.helper.request_params import RequestParams
+from app.helper.response import Response
 
 class Type(Resource):
-  # Initialize request parser in this controller
+  # Initialize request parser
   parser = reqparse.RequestParser(bundle_errors=True)
   parser.add_argument('Name', type=str, required=True)
   
-  def get(self, id):
+  @classmethod
+  def getDataById(cls, id):
     # get data from repository
-    item = TypeRepository.getById(id)
+    data = TypeService.getDataById(id)
 
-    # chek data
-    if item is None:
+    # check data
+    if data is None:
       ErrorHandler.itemNotFound(id, 'type')
 
+    return data
+
+  def get(self, id):
+    # get data
+    type = self.getDataById(id)
+
+    # data serialization
+    data = TypeService.serialization(type)
+    return data, 200
+
+  def put(self, id):
+    # check data
+    type = self.getDataById(id)
+
+    # get payload
+    payload = self.parser.parse_args()
+
+    # update data
+    TypeService.updateData(type, payload)
+
     # json response
-    response = TypeSchema().dumps(item).data
-    response = json.loads(response)
-    
+    response = TypeService.serialization(type)
     return response, 200
 
 
 class TypeList(Resource):
   def get(self):
-    # get data from repository
-    items = TypeRepository.getAll()
+    # get meta data
+    meta = RequestParams.pagination()
+
+    # get data from repository by service
+    types = TypeService.getAllData(
+      page_position = meta['PagePosition'],
+      page_size = meta['PageSize']
+    )
+    
+    # data serialization
+    data = TypeService.serialization(types['Data'], many=True)
+
+    # json response
+    response = Response.json(data, types['Meta'])
+    return response, 200
+
+  def post(self):
+    # get payload
+    payload = Type.parser.parse_args()
+
+    # insert data
+    type = TypeService.insertData(payload)
 
     # data serialization
-    data = TypeSchema(many=True).dumps(items).data
-    data = json.loads(data)
-    
-    # json response
-    response = ListResponse(
-      Data = data
-    ).toJSON()
-
-    return response, 200
-    
-
+    data = TypeService.serialization(type)
+    return data, 200
     
