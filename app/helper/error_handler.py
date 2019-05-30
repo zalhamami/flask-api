@@ -49,7 +49,7 @@ class ErrorHandler:
     abort(
       cls.code['server-error'],
       code = cls.code['server-error'],
-      message = 'An error ocurred when inserting the {0}.'.format(data)
+      message = 'An error ocurred when updating the {0}.'.format(data)
     )
 
   @classmethod
