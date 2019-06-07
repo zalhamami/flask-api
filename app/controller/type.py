@@ -1,4 +1,3 @@
-
 from flask_restful import Resource, reqparse
 
 from app.service.type import TypeService
