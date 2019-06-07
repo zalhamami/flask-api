@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
+from flask_jwt import JWT, jwt_required
 
 # local imports
 from config import app_config
@@ -19,6 +20,7 @@ def create_app(config_name):
   # get config
   app.config.from_object(app_config[config_name])
   app.config.from_pyfile('config.py')
+  app.secret_key = app.config['SECRET_KEY']
 
   # strict slashes
   app.url_map.strict_slashes = False
@@ -35,6 +37,10 @@ def create_app(config_name):
   # CORS
   CORS(app)
 
+  # jwt initialization
+  from app.security import authenticate, identity
+  jwt = JWT(app, authenticate, identity)
+  
   # routes initialization
   from app.routes import routes
   routes(app, api)

@@ -7,6 +7,7 @@ class Config(object):
 
   # Put any configurations here that are common across all environments
   API_VERSION = 'v1'
+  SECRET_KEY = 'WROwICimBauH6iISIExT'
 
 
 class DevelopmentConfig(Config):
