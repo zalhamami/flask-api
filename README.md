@@ -11,10 +11,6 @@ pip install -r requirements.txt
 
 ## Getting Started
 
-### Automatic Setup (for Debian-based Linux; incl. Ubuntu and WSL)
-
-Coming Soon.
-
 ### Manual Setup
 
 1. Make a config file by copying the configuration sample in `./instance/config.py.sample` to `./instance/config,py`
@@ -46,3 +42,7 @@ Coming Soon.
    export flask_app=run.py
    flask run
    ```
+
+### Automatic Setup (for Debian-based Linux; incl. Ubuntu and WSL)
+
+Coming Soon.
