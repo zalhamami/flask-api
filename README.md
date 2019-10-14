@@ -1,2 +1,2 @@
 # flask-api
-This is a Restful API, built with python and flask microframework
+A sample project to built Restful API using python and flask
