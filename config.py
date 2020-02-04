@@ -9,6 +9,9 @@ class Config(object):
   API_VERSION = 'v1'
   SECRET_KEY = 'WROwICimBauH6iISIExT'
 
+  # JWT
+  JWT_SECRET_KEY = 'WROwICimBauH6iISIExT'
+
 
 class DevelopmentConfig(Config):
   """
