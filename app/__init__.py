@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
-from flask_jwt import JWT, jwt_required
+from flask_jwt_extended import JWTManager
 
 # local imports
 from config import app_config
@@ -38,8 +38,7 @@ def create_app(config_name):
   CORS(app)
 
   # jwt initialization
-  from app.security import authenticate, identity
-  jwt = JWT(app, authenticate, identity)
+  jwt = JWTManager(app)
   
   # routes initialization
   from app.routes import routes

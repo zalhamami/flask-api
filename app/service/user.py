@@ -23,6 +23,12 @@ class UserService:
     return data
 
   @classmethod
+  def getDataByUsername(cls, username):
+    # get data from repository
+    data = UserRepository.getByUsername(username)
+    return data
+
+  @classmethod
   def insertData(cls, payload):
     data = UserRepository(
       name = payload['Username']
