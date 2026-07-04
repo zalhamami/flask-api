@@ -1,49 +1,44 @@
-import json
+from sqlalchemy.exc import SQLAlchemyError
 
-from app import db  
+from app import db
 from app.repository.type import TypeRepository
 from app.helper.error_handler import ErrorHandler
 from app.schema.type import TypeSchema
 
+
 class TypeService:
   @classmethod
-  def getAllData(cls, page_position, page_size, filter = None):
-    # get data from repository
-    data = TypeRepository.getAll(
-      page_position = page_position,
-      page_size = page_size,
-      filter = filter
+  def getAllData(cls, page_position, page_size, filter=None):
+    return TypeRepository.getAll(
+      page_position=page_position,
+      page_size=page_size,
+      filter=filter
     )
-    return data
 
   @classmethod
   def getDataById(cls, id):
-    # get data from repository
-    data = TypeRepository.getById(id)
-    return data
+    return TypeRepository.getById(id)
 
   @classmethod
   def insertData(cls, payload):
-    data = TypeRepository(
-      name = payload['Name']
-    )
+    data = TypeRepository(name=payload['name'])
     try:
       data.save()
-    except:
+    except SQLAlchemyError:
+      db.session.rollback()
       ErrorHandler.insertError('type')
     return data
-    
+
   @classmethod
   def updateData(cls, data, payload):
     try:
-      data.name = payload['Name']
+      data.name = payload['name']
       db.session.commit()
-    except:
+    except SQLAlchemyError:
+      db.session.rollback()
       ErrorHandler.updateError('type')
-    return 'ok'
+    return data
 
   @classmethod
-  def serialization(cls, data, many = False):
-    result = TypeSchema(many=many).dumps(data).data
-    result = json.loads(result)
-    return result
+  def serialization(cls, data, many=False):
+    return TypeSchema(many=many).dump(data)

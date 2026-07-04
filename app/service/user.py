@@ -1,55 +1,42 @@
-import json
+from sqlalchemy.exc import SQLAlchemyError
 
-from app import db  
+from app import db
 from app.repository.user import UserRepository
 from app.helper.error_handler import ErrorHandler
 from app.schema.user import UserSchema
 
+
 class UserService:
   @classmethod
-  def getAllData(cls, page_position, page_size, filter = None):
-    # get data from repository
-    data = UserRepository.getAll(
-      page_position = page_position,
-      page_size = page_size,
-      filter = filter
+  def getAllData(cls, page_position, page_size, filter=None):
+    return UserRepository.getAll(
+      page_position=page_position,
+      page_size=page_size,
+      filter=filter
     )
-    return data
 
   @classmethod
   def getDataById(cls, id):
-    # get data from repository
-    data = UserRepository.getById(id)
-    return data
+    return UserRepository.getById(id)
 
   @classmethod
   def getDataByUsername(cls, username):
-    # get data from repository
-    data = UserRepository.getByUsername(username)
-    return data
+    return UserRepository.getByUsername(username)
 
   @classmethod
   def insertData(cls, payload):
-    data = UserRepository(
-      name = payload['Username']
-    )
+    if cls.getDataByUsername(payload['username']):
+      ErrorHandler.itemExists(payload['username'], 'user')
+
+    user = UserRepository(username=payload['username'])
+    user.set_password(payload['password'])
     try:
-      data.save()
-    except:
+      user.save()
+    except SQLAlchemyError:
+      db.session.rollback()
       ErrorHandler.insertError('user')
-    return data
-    
-  @classmethod
-  def updateData(cls, data, payload):
-    try:
-      data.name = payload['User']
-      db.session.commit()
-    except:
-      ErrorHandler.updateError('username')
-    return 'ok'
+    return user
 
   @classmethod
-  def serialization(cls, data, many = False):
-    result = UserSchema(many=many).dumps(data).data
-    result = json.loads(result)
-    return result
+  def serialization(cls, data, many=False):
+    return UserSchema(many=many).dump(data)
