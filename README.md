@@ -1,48 +1,70 @@
 # Flask API
-A sample project to built Restful API using python and flask
+
+A sample project that builds a RESTful API using Python and Flask, structured in
+clean layers: `controller` (HTTP) -> `service` (business logic) -> `repository`
+(data access) -> `model` (persistence), with `schema` handling (de)serialization
+and validation.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the required dependencies
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
+## Configuration
+
+Secrets are read from environment variables and are never committed to source:
+
+```bash
+export SECRET_KEY="a-long-random-string"
+export JWT_SECRET_KEY="another-long-random-string"
+```
+
+For the database, copy `instance/config.sample.py` to `instance/config.py` and set
+`SQLALCHEMY_DATABASE_URI`.
+
 ## Getting Started
 
-### Manual Setup
+1. Configure the database (see above).
 
-1. Make a config file by copying the configuration sample in `./instance/config.py.sample` to `./instance/config,py`
-
-1. Modify the database configuration in `./instance/config.py`
-
-1. Migrate the database by running the following command
+1. Migrate the database:
 
    ```bash
-   flask db init
-   flask db migrate
    flask db upgrade
    ```
 
-1. Start Flask application in development mode
-
-   ```cmd
-   :: For Windows
-   set flask_config=development
-   set flask_env=development
-   set flask_app=run.py
-   flask run
-   ```
+1. Start the Flask application in development mode:
 
    ```bash
-   # For Linux/UNIX Shell
-   export flask_config=development
-   export flask_env=development
-   export flask_app=run.py
+   export FLASK_CONFIG=development
+   export FLASK_APP=run.py
    flask run
    ```
 
-### Automatic Setup (for Debian-based Linux; incl. Ubuntu and WSL)
+## API
 
-Coming Soon.
+| Method | Path            | Auth | Description                    |
+|--------|-----------------|------|--------------------------------|
+| GET    | `/ping`         | no   | Health check                   |
+| POST   | `/v1/user`      | no   | Register a user                |
+| GET    | `/v1/user`      | JWT  | List users (paginated)         |
+| POST   | `/v1/auth`      | no   | Log in, returns JWT tokens     |
+| GET    | `/v1/type`      | no   | List types (paginated)         |
+| POST   | `/v1/type`      | no   | Create a type                  |
+| GET    | `/v1/type/<id>` | no   | Get a type by id               |
+| PUT    | `/v1/type/<id>` | no   | Update a type                  |
+
+Request and response bodies use `snake_case` fields (for example `{"name": "..."}`).
+List endpoints accept `page_size` and `page_position` query parameters and return a
+`Data`/`Meta` envelope.
+
+## Running Tests
+
+```bash
+python -m pytest
+```
+
+The suite runs against an in-memory SQLite database (the `testing` config), so no
+external database is required.
